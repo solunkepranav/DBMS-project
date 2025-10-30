@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scholarship Management Portal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --secondary: #64748b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --light: #f8fafc;
+      --dark: #0f172a;
+      --border: #e2e8f0;
+      --shadow: 0 1px 3px rgba(0,0,0,0.1);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: var(--dark);
+    }
+
+    .navbar {
+      background: white;
+      box-shadow: var(--shadow);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .navbar-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+      text-decoration: none;
+      color: var(--secondary);
+    }
+
+    .nav-link:hover {
+      background: var(--light);
+      color: var(--primary);
+    }
+
+    .nav-link.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--dark);
+    }
+
+    .btn {
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.875rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-outline {
+      background: white;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--dark);
+      font-size: 0.875rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      opacity: 0.9;
+    }
+
+    .scheme-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+
+    .scheme-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .scheme-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .scheme-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .scheme-subtitle {
+      color: var(--secondary);
+      font-size: 0.875rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .badge-primary {
+      background: #dbeafe;
+      color: var(--primary);
+    }
+
+    .badge-success {
+      background: #d1fae5;
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge-danger {
+      background: #fee2e2;
+      color: var(--danger);
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    .table th {
+      background: var(--light);
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table tr:hover {
+      background: var(--light);
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .alert-success {
+      background: #d1fae5;
+      color: #065f46;
+      border-left: 4px solid var(--success);
+    }
+
+    .alert-error {
+      background: #fee2e2;
+      color: #991b1b;
+      border-left: 4px solid var(--danger);
+    }
+
+    .alert-info {
+      background: #dbeafe;
+      color: #1e40af;
+      border-left: 4px solid var(--primary);
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      transition: width 0.3s;
+    }
+
+    .filters {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .filters > * {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .hero {
+      background: white;
+      border-radius: 12px;
+      padding: 3rem 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2rem;
+    }
+
+    .hero-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .hero-subtitle {
+      font-size: 1.125rem;
+      color: var(--secondary);
+      margin-bottom: 2rem;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      font-size: 1.5rem;
+      color: white;
+    }
+
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+    }
+
+    .step {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      padding-bottom: 1rem;
+    }
+
+    .step::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--border);
+    }
+
+    .step.active::after {
+      background: var(--primary);
+    }
+
+    .step-number {
+      width: 32px;
+      height: 32px;
+      background: var(--border);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .step.active .step-number {
+      background: var(--primary);
+      color: white;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--secondary);
+    }
+
+    @media (max-width: 768px) {
+      .navbar-content {
+        flex-direction: column;
+      }
+
+      .hero-title {
+        font-size: 1.75rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-content">
+      <div class="brand">
+        <div class="brand-icon">SP</div>
+        <span>Scholarship Portal</span>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link active" onclick="navigateTo('home')">Home</a>
+        <a class="nav-link" onclick="navigateTo('browse')">Browse</a>
+        <a class="nav-link" id="navMyApps" onclick="navigateTo('applications')" style="display:none">My Applications</a>
+        <a class="nav-link" id="navProfile" onclick="navigateTo('profile')" style="display:none">Profile</a>
+        <a class="nav-link" id="navAdmin" onclick="navigateTo('admin')" style="display:none">Admin</a>
+        <button class="btn btn-primary" id="navLogin" onclick="navigateTo('login')">Login</button>
+        <button class="btn btn-danger" id="navLogout" onclick="logout()" style="display:none">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active">
+      <div class="hero">
+        <h1 class="hero-title">Welcome to Scholarship Portal</h1>
+        <p class="hero-subtitle">Find, apply, and track your scholarship applications in one place</p>
+        <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="navigateTo('browse')">Browse Scholarships</button>
+          <button class="btn btn-outline" onclick="navigateTo('login')">Get Started</button>
+        </div>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🔍</div>
+          <h3>Search & Filter</h3>
+          <p>Find scholarships that match your profile with advanced filters</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📝</div>
+          <h3>Easy Application</h3>
+          <p>Multi-step application process with document upload</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3>Track Progress</h3>
+          <p>Monitor your application status in real-time</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOGIN PAGE -->
+    <div id="page-login" class="page">
+      <div class="card" style="max-width: 500px; margin: 0 auto">
+        <div class="card-header">
+          <h2 class="card-title">Login</h2>
+        </div>
+        <div id="loginError"></div>
+        <form id="loginForm">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Login</button>
+          <p style="text-align:center; margin-top:1rem">
+            Don't have an account? <a href="#" onclick="navigateTo('register')" style="color:var(--primary)">Register here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- REGISTER PAGE -->
+    <div id="page-register" class="page">
+      <div class="card" style="max-width: 700px; margin: 0 auto">
+        <div class="card-header">
+          <h2 class="card-title">Register</h2>
+        </div>
+        <div id="registerError"></div>
+        <div id="registerSuccess"></div>
+        <form id="registerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Full Name *</label>
+              <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+              <label>Age</label>
+              <input type="number" name="age" min="10" max="100">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Gender</label>
+              <select name="gender">
+                <option value="">Select</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Email *</label>
+              <input type="email" name="email" required>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password *</label>
+              <input type="password" name="password" required>
+            </div>
+            <div class="form-group">
+              <label>Confirm Password *</label>
+              <input type="password" name="confirmPassword" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%">Register</button>
+          <p style="text-align:center; margin-top:1rem">
+            Already have an account? <a href="#" onclick="navigateTo('login')" style="color:var(--primary)">Login here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+
+    <!-- BROWSE SCHEMES PAGE -->
+    <div id="page-browse" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Browse Scholarships</h2>
+        </div>
+        <div class="filters">
+          <input type="text" id="searchQuery" placeholder="Search by name...">
+          <select id="filterYear">
+            <option value="">All Years</option>
+            <option>2024-25</option>
+            <option>2025-26</option>
+          </select>
+          <select id="filterType">
+            <option value="">All Types</option>
+            <option>Post-Matric</option>
+            <option>Vocational</option>
+          </select>
+          <select id="filterCategory">
+            <option value="">All Categories</option>
+            <option>Merit-Based</option>
+            <option>Need-Based</option>
+            <option>Vocational</option>
+            <option>Defence Background</option>
+          </select>
+          <button class="btn btn-primary" onclick="loadSchemes()">Search</button>
+        </div>
+        <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1rem">
+          <input type="checkbox" id="filterInternational">
+          <label for="filterInternational" style="margin:0">International Eligible Only</label>
+        </div>
+      </div>
+      <div id="schemesList"></div>
+    </div>
+
+    <!-- SCHEME DETAILS PAGE -->
+    <div id="page-scheme" class="page">
+      <div class="card" id="schemeDetails"></div>
+    </div>
+
+    <!-- APPLY PAGE -->
+    <div id="page-apply" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Apply for Scholarship</h2>
+        </div>
+        
+        <div class="step-indicator">
+          <div class="step active" id="stepInd1">
+            <div class="step-number">1</div>
+            <div>Personal Details</div>
+          </div>
+          <div class="step" id="stepInd2">
+            <div class="step-number">2</div>
+            <div>Family & Income</div>
+          </div>
+          <div class="step" id="stepInd3">
+            <div class="step-number">3</div>
+            <div>Education</div>
+          </div>
+          <div class="step" id="stepInd4">
+            <div class="step-number">4</div>
+            <div>Activities</div>
+          </div>
+          <div class="step" id="stepInd5">
+            <div class="step-number">5</div>
+            <div>Documents</div>
+          </div>
+        </div>
+
+        <div id="applyError"></div>
+        <div id="applySuccess"></div>
+
+        <form id="applyForm">
+          <input type="hidden" name="scheme_id" id="applySchemeId">
+          
+          <!-- Step 1 -->
+          <div id="applyStep1" class="apply-step">
+            <h3 style="margin-bottom:1rem">Personal & Contact Details</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Full Name *</label>
+                <input type="text" name="full_name" required>
+              </div>
+              <div class="form-group">
+                <label>Email *</label>
+                <input type="email" name="email" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Contact Number</label>
+                <input type="tel" name="contact_number">
+              </div>
+              <div class="form-group">
+                <label>Date of Birth</label>
+                <input type="date" name="dob">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nationality</label>
+                <select name="nationality">
+                  <option>Indian</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Disability</label>
+                <select name="disability">
+                  <option value="no">No</option>
+                  <option value="yes">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Permanent Address</label>
+              <textarea name="perm_address"></textarea>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next</button>
+          </div>
+
+          <!-- Step 2 -->
+          <div id="applyStep2" class="apply-step" style="display:none">
+            <h3 style="margin-bottom:1rem">Family & Income Details</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Father's Annual Income</label>
+                <input type="number" name="father_income">
+              </div>
+              <div class="form-group">
+                <label>Mother's Annual Income</label>
+                <input type="number" name="mother_income">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Emergency Contact</label>
+              <input type="text" name="emergency_contact">
+            </div>
+            <div style="display:flex; gap:1rem">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(1)">Previous</button>
+              <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next</button>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div id="applyStep3" class="apply-step" style="display:none">
+            <h3 style="margin-bottom:1rem">Educational Qualifications</h3>
+            <div class="form-row">
+              <div class="form-group">
+                <label>10th Percentage</label>
+                <input type="number" name="tenth_percentage" min="0" max="100" step="0.01">
+              </div>
+              <div class="form-group">
+                <label>12th Percentage</label>
+                <input type="number" name="twelfth_percentage" min="0" max="100" step="0.01">
+              </div>
+            </div>
+            <div style="display:flex; gap:1rem">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(2)">Previous</button>
+              <button type="button" class="btn btn-primary" onclick="goToStep(4)">Next</button>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div id="applyStep4" class="apply-step" style="display:none">
+            <h3 style="margin-bottom:1rem">Extracurricular Activities</h3>
+            <div class="form-group">
+              <label>Activities (Brief description)</label>
+              <textarea name="activities" placeholder="Describe your extracurricular activities, achievements, etc."></textarea>
+            </div>
+            <div style="display:flex; gap:1rem">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(3)">Previous</button>
+              <button type="button" class="btn btn-primary" onclick="goToStep(5)">Next</button>
+            </div>
+          </div>
+
+          <!-- Step 5 -->
+          <div id="applyStep5" class="apply-step" style="display:none">
+            <h3 style="margin-bottom:1rem">Document Upload</h3>
+            <div class="form-group">
+              <label>Photo (Required)</label>
+              <input type="file" name="photo" accept="image/*">
+            </div>
+            <div class="form-group">
+              <label>10th Marksheet</label>
+              <input type="file" name="mark10" accept=".pdf,.jpg,.jpeg,.png">
+            </div>
+            <div style="display:flex; gap:1rem">
+              <button type="button" class="btn btn-secondary" onclick="goToStep(4)">Previous</button>
+              <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MY APPLICATIONS PAGE -->
+    <div id="page-applications" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">My Applications</h2>
+        </div>
+        <div id="applicationsList"></div>
+      </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="page-profile" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">My Profile</h2>
+        </div>
+        <div id="profileContent"></div>
+      </div>
+    </div>
+
+    <!-- ADMIN PAGE -->
+    <div id="page-admin" class="page">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Admin Dashboard</h2>
+        </div>
+        <div id="adminStats"></div>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Pending Applications</h2>
+        </div>
+        <div id="adminPending"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let currentApplyStep = 1;
+
+    // Navigation
+    function navigateTo(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      
+      const pageEl = document.getElementById('page-' + page);
+      if (pageEl) {
+        pageEl.classList.add('active');
+        
+        // Load data for specific pages
+        if (page === 'browse') loadSchemes();
+        if (page === 'applications') loadMyApplications();
+        if (page === 'profile') loadProfile();
+        if (page === 'admin') loadAdmin();
+      }
+    }
+
+    // Update UI based on login state
+    function updateNavigation() {
+      if (currentUser) {
+        document.getElementById('navLogin').style.display = 'none';
+        document.getElementById('navLogout').style.display = 'block';
+        document.getElementById('navMyApps').style.display = 'block';
+        document.getElementById('navProfile').style.display = 'block';
+        if (currentUser.role === 'admin') {
+          document.getElementById('navAdmin').style.display = 'block';
+        }
+      } else {
+        document.getElementById('navLogin').style.display = 'block';
+        document.getElementById('navLogout').style.display = 'none';
+        document.getElementById('navMyApps').style.display = 'none';
+        document.getElementById('navProfile').style.display = 'none';
+        document.getElementById('navAdmin').style.display = 'none';
+      }
+    }
+
+    // Login
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+      
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        
+        
+        if (res.ok) {          
+          currentUser = result.user;
+          updateNavigation();
+          navigateTo('browse');
+          e.target.reset();
+          showAlert('loginError', '');
+        } else {
+          showAlert('loginError', result.error || 'Login failed', 'error');
+        }
+      } catch (err) {
+        showAlert('loginError', 'An error occurred. Please try again.', 'error');
+      }
+    });
+
+    // Register
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData);
+
+      if (data.password !== data.confirmPassword) {
+        showAlert('registerError', 'Passwords do not match', 'error');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/register', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+
+        if (res.ok) {
+          showAlert('registerSuccess', 'Registration successful! Please login.', 'success');
+          showAlert('registerError', '');
+          e.target.reset();
+        } else {
+          showAlert('registerError', result.error || 'Registration failed', 'error');
+          showAlert('registerSuccess', '');
+        }
+      } catch (err) {
+        showAlert('registerError', 'An error occurred. Please try again.', 'error');
+      }
+    });
+
+    // Logout
+    function logout() {
+      currentUser = null;
+      updateNavigation();
+      navigateTo('home');
+    }
+
+    // Load Schemes
+    async function loadSchemes() {
+      const listEl = document.getElementById('schemesList');
+      listEl.innerHTML = '<div class="loading">Loading schemes...</div>';
+      
+      const params = new URLSearchParams();
+      const q = document.getElementById('searchQuery').value;
+      const year = document.getElementById('filterYear').value;
+      const type = document.getElementById('filterType').value;
+      const category = document.getElementById('filterCategory').value;
+      const international = document.getElementById('filterInternational').checked;
+
+      if (q) params.set('q', q);
+      if (year) params.set('academic_year', year);
+      if (type) params.set('type', type);
+      if (category) params.set('category', category);
+      if (international) params.set('international', '1');
+
+      try {
+        const res = await fetch('/api/schemes?' + params.toString());
+        const result = await res.json();
+
+        if (!result.schemes || result.schemes.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">No schemes found matching your criteria.</div>';
+          return;
+        }
+
+        listEl.innerHTML = '';
+        result.schemes.forEach(s => {
+          const card = document.createElement('div');
+          card.className = 'scheme-card';
+          card.innerHTML = `
+            <div class="scheme-header">
+              <div>
+                <h3 class="scheme-title">${escapeHTML(s.scheme_name)}</h3>
+                <div class="scheme-subtitle">${escapeHTML(s.scholarship_name)} • ${escapeHTML(s.academic_year || '')}</div>
+              </div>
+              <button class="btn btn-primary" onclick="openSchemeDetails(${s.id})">View</button>
+            </div>
+            <div>
+              <span class="badge badge-primary">Amount: ₹${s.amount || 0}</span>
+              <span class="badge badge-success">Type: ${escapeHTML(s.type || 'N/A')}</span>
+              <span class="badge badge-warning">Category: ${escapeHTML(s.category || 'N/A')}</span>
+            </div>
+            <div style="margin-top: 0.75rem; color: var(--secondary); font-size: 0.875rem;">
+              <strong>Deadline:</strong> ${s.application_deadline ? new Date(s.application_deadline).toLocaleDateString() : 'N/A'}
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
+      } catch (err) {
+        listEl.innerHTML = '<div class="alert alert-error">Failed to load schemes.</div>';
+      }
+    }
+
+    // Open Scheme Details
+    async function openSchemeDetails(id) {
+      const detailEl = document.getElementById('schemeDetails');
+      detailEl.innerHTML = '<div class="loading">Loading details...</div>';
+      navigateTo('scheme');
+
+      try {
+        const res = await fetch('/api/schemes/' + id);
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+
+        const s = result.scheme;
+        detailEl.innerHTML = `
+          <div class="card-header">
+            <h2 class="card-title">${escapeHTML(s.scheme_name)}</h2>
+          </div>
+          <p class="scheme-subtitle">${escapeHTML(s.scholarship_name)}</p>
+          <div class="stats-grid" style="margin-top: 1.5rem">
+            <div class="stat-card" style="background:var(--success)">
+              <div class="stat-value">₹${s.amount || 0}</div>
+              <div class="stat-label">Amount</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${escapeHTML(s.type || 'N/A')}</div>
+              <div class="stat-label">Type</div>
+            </div>
+            <div class="stat-card" style="background:var(--warning)">
+              <div class="stat-value">${escapeHTML(s.academic_year || 'N/A')}</div>
+              <div class="stat-label">Academic Year</div>
+            </div>
+          </div>
+          <h3>Eligibility</h3>
+          <ul>
+            <li><strong>Age:</strong> ${s.min_age || 'Any'} to ${s.max_age || 'Any'}</li>
+            <li><strong>Income Limit:</strong> ₹${s.income_limit || 'N/A'}</li>
+            <li><strong>Qualification:</strong> ${escapeHTML(s.required_qualification || 'N/A')}</li>
+            <li><strong>International Eligible:</strong> ${s.is_international_eligible ? 'Yes' : 'No'}</li>
+          </ul>
+          <h3 style="margin-top:1.5rem">Description</h3>
+          <p>${escapeHTML(s.description || 'No description provided.')}</p>
+          <div style="margin-top: 2rem; display:flex; gap:1rem; justify-content:flex-end">
+            <button class="btn btn-secondary" onclick="navigateTo('browse')">Back to List</button>
+            <button class="btn btn-primary" onclick="startApply(${s.id})">Apply Now</button>
+          </div>
+        `;
+      } catch (err) {
+        detailEl.innerHTML = `<div class="alert alert-error">Error: ${err.message}</div>`;
+      }
+    }
+
+    // Start Application
+    function startApply(schemeId) {
+      if (!currentUser) {
+        alert('Please login to apply.');
+        navigateTo('login');
+        return;
+      }
+      document.getElementById('applySchemeId').value = schemeId;
+      document.querySelector('#applyForm [name="full_name"]').value = currentUser.name || '';
+      document.querySelector('#applyForm [name="email"]').value = currentUser.email || '';
+      goToStep(1);
+      navigateTo('apply');
+    }
+
+    // Go to Step (Multi-step form)
+    function goToStep(stepNum) {
+      currentApplyStep = stepNum;
+      document.querySelectorAll('.apply-step').forEach(s => s.style.display = 'none');
+      document.getElementById('applyStep' + stepNum).style.display = 'block';
+
+      document.querySelectorAll('.step-indicator .step').forEach((s, index) => {
+        if (index < stepNum) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+      // Ensure the first step's indicator is active
+      document.getElementById('stepInd1').classList.add('active');
+    }
+
+    // Submit Application
+    document.getElementById('applyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!currentUser) {
+        showAlert('applyError', 'You must be logged in to apply.', 'error');
+        return;
+      }
+
+      const form = e.target;
+      const formData = new FormData(form);
+      const data = {};
+      // Collect non-file fields into 'data' object
+      for (let [key, value] of formData.entries()) {
+        if (!(value instanceof File)) {
+          data[key] = value;
+        }
+      }
+      data.user_id = currentUser.id;
+      
+      // Create a new FormData for posting
+      const postData = new FormData();
+      
+      // Append files
+      const photoFile = form.querySelector('input[name="photo"]').files[0];
+      const mark10File = form.querySelector('input[name="mark10"]').files[0];
+      if (photoFile) postData.append('photo', photoFile);
+      if (mark10File) postData.append('mark10', mark10File);
+      
+      // Append the JSON data
+      postData.append('data', JSON.stringify(data));
+      
+      try {
+        const res = await fetch('/api/apply', {
+          method: 'POST',
+          body: postData 
+          // Do NOT set Content-Type, browser will set it to multipart/form-data
+        });
+        const result = await res.json();
+        
+        if (res.ok) {
+          showAlert('applySuccess', 'Application submitted successfully! ID: ' + result.applicationId, 'success');
+          showAlert('applyError', '');
+          e.target.reset();
+          setTimeout(() => navigateTo('applications'), 2000);
+        } else {
+          showAlert('applyError', result.error || 'Submission failed', 'error');
+        }
+      } catch (err) {
+        showAlert('applyError', 'An error occurred. Please try again.', 'error');
+      }
+    });
+
+    // Load My Applications
+    async function loadMyApplications() {
+      const listEl = document.getElementById('applicationsList');
+      if (!currentUser) {
+        listEl.innerHTML = '<div class="alert alert-info">Please login to view your applications.</div>';
+        return;
+      }
+      listEl.innerHTML = '<div class="loading">Loading applications...</div>';
+      
+      try {
+        const res = await fetch('/api/my-applications/' + currentUser.id);
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+
+        if (!result.applications || result.applications.length === 0) {
+          listEl.innerHTML = '<div class="alert alert-info">You have not submitted any applications yet.</div>';
+          return;
+        }
+
+        listEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>App ID</th>
+                  <th>Scheme Name</th>
+                  <th>Scholarship</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${result.applications.map(a => `
+                  <tr>
+                    <td>${a.application_id}</td>
+                    <td>${escapeHTML(a.scheme_name)}</td>
+                    <td>${escapeHTML(a.scholarship_name)}</td>
+                    <td>${new Date(a.application_date).toLocaleDateString()}</td>
+                    <td>${getStatusBadge(a.status)}</td>
+                    <td><button class="btn btn-primary" style="padding: 0.5rem 1rem" onclick="viewApplicationDetails(${a.application_id})">View</button></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        listEl.innerHTML = `<div class="alert alert-error">Failed to load applications: ${err.message}</div>`;
+      }
+    }
+
+    // View Application Details
+    async function viewApplicationDetails(id) {
+      try {
+        const res = await fetch('/api/application/' + id);
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error);
+
+        const app = result.application;
+        const docs = result.documents;
+        
+        // For simplicity, using alert. A modal would be better.
+        let docList = docs.length > 0 ? docs.map(d => `\n- ${d.doc_type} (${d.filename})`).join('') : '\n- No documents';
+        alert(
+          `Application ID: ${app.id}\n` +
+          `Scheme: ${app.scheme_name}\n` +
+          `Status: ${app.status}\n` +
+          `Applied On: ${new Date(app.application_date).toLocaleDateString()}\n` +
+          `Documents: ${docList}`
+        );
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    }
+
+    // Load Profile
+    function loadProfile() {
+      const contentEl = document.getElementById('profileContent');
+      if (!currentUser) {
+        contentEl.innerHTML = '<div class="alert alert-info">Please login to view your profile.</div>';
+        return;
+      }
+      contentEl.innerHTML = `
+        <div class="form-group">
+          <label>Name</label>
+          <input value="${escapeHTML(currentUser.name)}" disabled>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input value="${escapeHTML(currentUser.email)}" disabled>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Age</label>
+            <input value="${currentUser.age || 'N/A'}" disabled>
+          </div>
+          <div class="form-group">
+            <label>Gender</label>
+            <input value="${escapeHTML(currentUser.gender || 'N/A')}" disabled>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <input value="${escapeHTML(currentUser.role)}" disabled>
+        </div>
+      `;
+    }
+
+    // Load Admin
+    async function loadAdmin() {
+      if (!currentUser || currentUser.role !== 'admin') {
+        navigateTo('home');
+        return;
+      }
+      loadAdminStats();
+      loadAdminPending();
+    }
+
+    async function loadAdminStats() {
+      const statsEl = document.getElementById('adminStats');
+      try {
+        const res = await fetch('/api/admin/stats');
+        const stats = await res.json();
+        statsEl.innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-value">${stats.total_users}</div>
+              <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">${stats.total_schemes}</div>
+              <div class="stat-label">Total Schemes</div>
+            </div>
+            <div class="stat-card" style="background:var(--warning)">
+              <div class="stat-value">${stats.pending_applications}</div>
+              <div class="stat-label">Pending Applications</div>
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        statsEl.innerHTML = '<div class="alert alert-error">Failed to load stats.</div>';
+      }
+    }
+
+    async function loadAdminPending() {
+      const pendingEl = document.getElementById('adminPending');
+      try {
+        const res = await fetch('/api/admin/pending-applications');
+        const result = await res.json();
+
+        if (!result.applications || result.applications.length === 0) {
+          pendingEl.innerHTML = '<div class="alert alert-info">No pending applications.</div>';
+          return;
+        }
+
+        pendingEl.innerHTML = `
+          <div style="overflow-x:auto;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>App ID</th>
+                  <th>Applicant</th>
+                  <th>Scheme</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${result.applications.map(a => `
+                  <tr>
+                    <td>${a.id}</td>
+                    <td>${escapeHTML(a.applicant_name)} (${escapeHTML(a.applicant_email)})</td>
+                    <td>${escapeHTML(a.scheme_name)}</td>
+                    <td>${new Date(a.application_date).toLocaleDateString()}</td>
+                    <td style="display:flex; gap:0.5rem; flex-wrap:wrap">
+                      <button class_name="btn btn-success" style="padding: 0.5rem 1rem" onclick="adminApprove(${a.id})">Approve</button>
+                      <button class="btn btn-danger" style="padding: 0.5rem 1rem" onclick="adminReject(${a.id})">Reject</button>
+                      <button class="btn btn-secondary" style="padding: 0.5rem 1rem" onclick="viewApplicationDetails(${a.id})">Details</button>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      } catch (err) {
+        pendingEl.innerHTML = '<div class="alert alert-error">Failed to load pending applications.</div>';
+      }
+    }
+
+    // Admin Approve
+    async function adminApprove(id) {
+      if (!confirm('Are you sure you want to approve this application?')) return;
+      try {
+        const res = await fetch('/api/admin/application/' + id + '/approve', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to approve');
+        loadAdmin(); // Refresh data
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // Admin Reject
+    async function adminReject(id) {
+      if (!confirm('Are you sure you want to REJECT this application?')) return;
+      try {
+        const res = await fetch('/api/admin/application/' + id + '/reject', { method: 'POST' });
+        if (!res.ok) throw new Error('Failed to reject');
+        loadAdmin(); // Refresh data
+      } catch (err) {
+        alert(err.message);
+      }
+    }
+
+    // --- HELPER FUNCTIONS ---
+    function showAlert(id, message, type = 'error') {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.className = `alert alert-${type}`;
+      el.textContent = message;
+      el.style.display = message ? 'block' : 'none';
+    }
+
+    function getStatusBadge(status) {
+      if (status === 'Approved') return `<span class="badge badge-success">Approved</span>`;
+      if (status === 'Rejected') return `<span class="badge badge-danger">Rejected</span>`;
+      return `<span class="badge badge-warning">Pending</span>`;
+    }
+
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+
+    // Initial Load
+    updateNavigation();
+    navigateTo('home');
+
+  </script></body></html>
