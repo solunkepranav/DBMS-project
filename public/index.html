@@ -903,7 +903,7 @@
       const data = Object.fromEntries(formData);
       
       try {
-        const res = await fetch('/api/login', {
+        const res = await fetch('http://localhost:5500/api/login', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
@@ -937,8 +937,8 @@
       }
 
       try {
-        const res = await fetch('/api/register', {
-          method: 'POST',
+        const res = await fetch('http://localhost:5500/api/register', {
+        method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
         });
@@ -983,7 +983,7 @@
       if (international) params.set('international', '1');
 
       try {
-        const res = await fetch('/api/schemes?' + params.toString());
+        const res = await fetch('http://localhost:5500/api/schemes?' + params.toString());
         const result = await res.json();
 
         if (!result.schemes || result.schemes.length === 0) {
@@ -1026,7 +1026,7 @@
       navigateTo('scheme');
 
       try {
-        const res = await fetch('/api/schemes/' + id);
+        const res = await fetch('http://localhost:5500/api/schemes/' + id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1132,7 +1132,7 @@
       postData.append('data', JSON.stringify(data));
       
       try {
-        const res = await fetch('/api/apply', {
+        const res = await fetch('http://localhost:5500/api/apply', {
           method: 'POST',
           body: postData 
           // Do NOT set Content-Type, browser will set it to multipart/form-data
@@ -1162,7 +1162,7 @@
       listEl.innerHTML = '<div class="loading">Loading applications...</div>';
       
       try {
-        const res = await fetch('/api/my-applications/' + currentUser.id);
+        const res = await fetch('http://localhost:5500/api/my-applications/' + currentUser.id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1207,7 +1207,7 @@
     // View Application Details
     async function viewApplicationDetails(id) {
       try {
-        const res = await fetch('/api/application/' + id);
+        const res = await fetch('http://localhost:5500/api/application/' + id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1274,7 +1274,7 @@
     async function loadAdminStats() {
       const statsEl = document.getElementById('adminStats');
       try {
-        const res = await fetch('/api/admin/stats');
+        const res = await fetch('http://localhost:5500/api/admin/stats');
         const stats = await res.json();
         statsEl.innerHTML = `
           <div class="stats-grid">
@@ -1300,7 +1300,7 @@
     async function loadAdminPending() {
       const pendingEl = document.getElementById('adminPending');
       try {
-        const res = await fetch('/api/admin/pending-applications');
+        const res = await fetch('http://localhost:5500/api/admin/pending-applications');
         const result = await res.json();
 
         if (!result.applications || result.applications.length === 0) {
@@ -1347,7 +1347,7 @@
     async function adminApprove(id) {
       if (!confirm('Are you sure you want to approve this application?')) return;
       try {
-        const res = await fetch('/api/admin/application/' + id + '/approve', { method: 'POST' });
+        const res = await fetch('http://localhost:5500/api/admin/application/' + id + '/approve', { method: 'POST' });
         if (!res.ok) throw new Error('Failed to approve');
         loadAdmin(); // Refresh data
       } catch (err) {
@@ -1359,7 +1359,7 @@
     async function adminReject(id) {
       if (!confirm('Are you sure you want to REJECT this application?')) return;
       try {
-        const res = await fetch('/api/admin/application/' + id + '/reject', { method: 'POST' });
+        const res = await fetch('http://localhost:5500/api/admin/application/' + id + '/reject', { method: 'POST' });
         if (!res.ok) throw new Error('Failed to reject');
         loadAdmin(); // Refresh data
       } catch (err) {

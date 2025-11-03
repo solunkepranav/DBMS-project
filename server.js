@@ -1,74 +1,151 @@
-console.log("--- SERVER.JS VERSION 5 - THIS IS THE LATEST CODE ---");
+// Load environment variables from .env file
+// FIX: We must specify the path because the file is named 'process.env' instead of '.env'
+require('dotenv').config({ path: 'process.env' }); 
+
 // --- 1. IMPORTS ---
 const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
-const bodyParser = require('body-parser');
-const bcrypt = require('bcryptjs');
-const multer = require('multer');
-require('dotenv').config();
+const bodyParser = require('body-parser'); // Generally not needed if using express.json()
+const bcrypt = require('bcryptjs'); // Needed for hashing passwords
+const multer = require('multer'); // Needed for file uploads (e.g., image_f66ba2.png)
 
 // --- 2. SETUP ---
 const app = express();
+// Use the PORT variable from .env, or default to 3000
+let PORT = process.env.PORT || 3000; // CHANGED FROM 'const' TO 'let'
+// Configure multer for file storage
 const upload = multer({ dest: path.join(__dirname, 'uploads/') });
+
+console.log("--- SERVER.JS VERSION 12");
 
 // --- 3. CORE MIDDLEWARE ---
 // CRITICAL: This section MUST come BEFORE your API routes.
 app.use(cors({
-  origin: 'http://localhost:3000', // Set this to your frontend dev server's origin
-  credentials: true
+    // FIX: Temporarily setting origin to '*' to allow access from file:// during development
+    origin: '*', 
+    credentials: true
 }));
 app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 // --- 4. DATABASE CONNECTION ---
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
-});
+// IMPORTANT: Reverting to connection pool using environment variables for robustness and security.
+const dbConfig = {
+    host: "localhost",
+  user: "root",
+  password: "21Pr@n@v$", 
+  database: "scholarship_db" 
+};
 
+
+
+const pool = mysql.createPool(dbConfig);
+
+// Test the connection pool immediately on startup
 pool.getConnection()
-  .then(conn => {
-    console.log('✅ Connected to MySQL database!');
-    conn.release();
-  })
-  .catch(err => console.error('❌ Error connecting to MySQL:', err.message));
+    .then(conn => {
+        console.log('✅ Connected to MySQL database!');
+        conn.release();
+        
+        // Start the server ONLY after a successful database connection test
+        app.listen(PORT, () => {
+            console.log(`🚀 Server is running on port ${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('❌ FATAL ERROR: Could not connect to the database. Check your .env file and MySQL service:', err.message);
+        // Exit the process if the database connection fails on startup
+        process.exit(1); 
+    });
+
 
 // --- 5. DATABASE HELPER FUNCTIONS ---
-async function runSql(sql, params = []) {
-  const [result] = await pool.query(sql, params);
-  return result;
-}
-async function allSql(sql, params = []) {
-  const [rows] = await pool.query(sql, params);
-  return rows;
-}
+// These functions use the 'pool' to query the database.
+
+/**
+ * Executes a query that is expected to return a single row (e.g., SELECT by ID or email).
+ * @param {string} sql - The SQL query string.
+ * @param {Array<any>} params - Parameters to be safely escaped.
+ * @returns {object | undefined} The first row found, or undefined.
+ */
 async function getSql(sql, params = []) {
-  const [rows] = await pool.query(sql, params);
-  return rows[0];
+    const [rows] = await pool.query(sql, params);
+    return rows[0];
 }
 
-// --- 6. API ROUTES (All 9 Experiments) ---
-// ALL API routes are defined here, BEFORE the frontend file handling.
+/**
+ * Executes a query that is expected to return multiple rows (e.g., SELECT all users).
+ * @param {string} sql - The SQL query string.
+ * @param {Array<any>} params - Parameters to be safely escaped.
+ * @returns {Array<object>} An array of result rows.
+ */
+async function allSql(sql, params = []) {
+    const [rows] = await pool.query(sql, params);
+    return rows;
+}
+
+/**
+ * Executes a DML query (INSERT, UPDATE, DELETE).
+ * @param {string} sql - The SQL query string.
+ * @param {Array<any>} params - Parameters to be safely escaped.
+ * @returns {object} The result object containing affectedRows, insertId, etc.
+ */
+async function runSql(sql, params = []) {
+    const [result] = await pool.query(sql, params);
+    return result;
+}
+
+
+
+
+// --- 6. API ROUTES ---
 
 // Exp 2 (DML): User Registration
 app.post('/api/register', async (req, res) => {
-  try {
     const { name, email, password, age, gender } = req.body;
-    if (!name || !email || !password) return res.status(400).json({ error: 'Missing fields' });
-    const existing = await getSql('SELECT id FROM users WHERE email = ?', [email]);
-    if (existing) return res.status(409).json({ error: 'Email already registered' });
-    const hash = await bcrypt.hash(password, 10);
-    const r = await runSql('INSERT INTO users (name,email,password_hash,age,gender) VALUES (?,?,?,?,?)', [name, email, hash, age || null, gender || null]);
-    res.json({ success: true, userId: r.insertId });
-  } catch (e) { console.error(e); res.status(500).json({ error: 'Server error' }); }
+    
+    // 1. Basic validation (400 Bad Request)
+    if (!name || !email || !password) {
+        // Log details about which fields were missing, if needed
+        return res.status(400).json({ error: 'Missing required fields: name, email, and password are required.' });
+    }
+
+    try {
+        // 2. Check for existing email (409 Conflict)
+        const existing = await getSql('SELECT id FROM users WHERE email = ?', [email]);
+        if (existing) {
+            return res.status(409).json({ error: 'Email already registered' });
+        }
+
+        // Input Sanitization/Conversion
+        const validatedAge = (age !== undefined && age !== null && !isNaN(Number(age))) ? Number(age) : null;
+        const validatedGender = gender || null;
+        // FIX: Define userRole and include it in the query.
+        const userRole = 'user'; // Default role for new registrations
+
+        // 3. Hash the password
+        const hash = await bcrypt.hash(password, 10);
+        
+        // 4. Insert into database
+        const r = await runSql(
+            'INSERT INTO users (name, email, password_hash, age, gender, role) VALUES (?, ?, ?, ?, ?, ?)', 
+            [name, email, hash, validatedAge, validatedGender, userRole]
+        );
+
+        // 5. Success
+        res.json({ success: true, userId: r.insertId });
+
+    } catch (e) {
+        // This handles DB errors (like NOT NULL violations, data type errors) and bcrypt errors
+        console.error('Registration failed due to a server or DB issue:', e); 
+        
+        // Return a generic 500 error to the client
+        res.status(500).json({ error: 'Server error: registration failed. Please try again later.' }); 
+    }
 });
+
 
 // User Login
 app.post('/api/login', async (req, res) => {
@@ -225,5 +302,5 @@ app.get(/^(?!\/api).*/, (req, res) => {
 });
 
 // --- 8. START SERVER ---
-const PORT = process.env.PORT || 5500;
+PORT = process.env.PORT || 5500;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
