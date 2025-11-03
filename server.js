@@ -1,29 +1,27 @@
-// Load environment variables from .env file
-// FIX: We must specify the path because the file is named 'process.env' instead of '.env'
-require('dotenv').config({ path: 'process.env' }); 
-
 // --- 1. IMPORTS ---
+// Load environment variables from .env file
+require('dotenv').config(); 
+
 const express = require('express');
 const mysql = require('mysql2/promise');
 const path = require('path');
 const cors = require('cors');
-const bodyParser = require('body-parser'); // Generally not needed if using express.json()
-const bcrypt = require('bcryptjs'); // Needed for hashing passwords
-const multer = require('multer'); // Needed for file uploads (e.g., image_f66ba2.png)
+const bodyParser = require('body-parser');
+const bcrypt = require('bcryptjs');
+const multer = require('multer');
 
 // --- 2. SETUP ---
 const app = express();
-// Use the PORT variable from .env, or default to 3000
-let PORT = process.env.PORT || 3000; // CHANGED FROM 'const' TO 'let'
+// Use the PORT variable from .env, or default to 5500
+const PORT = process.env.PORT || 5500;
 // Configure multer for file storage
 const upload = multer({ dest: path.join(__dirname, 'uploads/') });
 
-console.log("--- SERVER.JS VERSION 12");
+console.log("--- SERVER.JS (Corrected Version)");
 
 // --- 3. CORE MIDDLEWARE ---
 // CRITICAL: This section MUST come BEFORE your API routes.
 app.use(cors({
-    // FIX: Temporarily setting origin to '*' to allow access from file:// during development
     origin: '*', 
     credentials: true
 }));
@@ -31,44 +29,21 @@ app.use(express.json()); // For parsing application/json
 app.use(express.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
 
 // --- 4. DATABASE CONNECTION ---
-// IMPORTANT: Reverting to connection pool using environment variables for robustness and security.
+// IMPORTANT: Using environment variables for robustness and security.
 const dbConfig = {
-    host: "localhost",
-  user: "root",
-  password: "21Pr@n@v$", 
-  database: "scholarship_db" 
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD, 
+    database: process.env.DB_DATABASE 
 };
-
-
 
 const pool = mysql.createPool(dbConfig);
 
-// Test the connection pool immediately on startup
-pool.getConnection()
-    .then(conn => {
-        console.log('✅ Connected to MySQL database!');
-        conn.release();
-        
-        // Start the server ONLY after a successful database connection test
-        app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
-        });
-    })
-    .catch(err => {
-        console.error('❌ FATAL ERROR: Could not connect to the database. Check your .env file and MySQL service:', err.message);
-        // Exit the process if the database connection fails on startup
-        process.exit(1); 
-    });
-
 
 // --- 5. DATABASE HELPER FUNCTIONS ---
-// These functions use the 'pool' to query the database.
 
 /**
  * Executes a query that is expected to return a single row (e.g., SELECT by ID or email).
- * @param {string} sql - The SQL query string.
- * @param {Array<any>} params - Parameters to be safely escaped.
- * @returns {object | undefined} The first row found, or undefined.
  */
 async function getSql(sql, params = []) {
     const [rows] = await pool.query(sql, params);
@@ -77,9 +52,6 @@ async function getSql(sql, params = []) {
 
 /**
  * Executes a query that is expected to return multiple rows (e.g., SELECT all users).
- * @param {string} sql - The SQL query string.
- * @param {Array<any>} params - Parameters to be safely escaped.
- * @returns {Array<object>} An array of result rows.
  */
 async function allSql(sql, params = []) {
     const [rows] = await pool.query(sql, params);
@@ -88,17 +60,11 @@ async function allSql(sql, params = []) {
 
 /**
  * Executes a DML query (INSERT, UPDATE, DELETE).
- * @param {string} sql - The SQL query string.
- * @param {Array<any>} params - Parameters to be safely escaped.
- * @returns {object} The result object containing affectedRows, insertId, etc.
  */
 async function runSql(sql, params = []) {
     const [result] = await pool.query(sql, params);
     return result;
 }
-
-
-
 
 // --- 6. API ROUTES ---
 
@@ -106,42 +72,31 @@ async function runSql(sql, params = []) {
 app.post('/api/register', async (req, res) => {
     const { name, email, password, age, gender } = req.body;
     
-    // 1. Basic validation (400 Bad Request)
     if (!name || !email || !password) {
-        // Log details about which fields were missing, if needed
         return res.status(400).json({ error: 'Missing required fields: name, email, and password are required.' });
     }
 
     try {
-        // 2. Check for existing email (409 Conflict)
         const existing = await getSql('SELECT id FROM users WHERE email = ?', [email]);
         if (existing) {
             return res.status(409).json({ error: 'Email already registered' });
         }
 
-        // Input Sanitization/Conversion
         const validatedAge = (age !== undefined && age !== null && !isNaN(Number(age))) ? Number(age) : null;
         const validatedGender = gender || null;
-        // FIX: Define userRole and include it in the query.
-        const userRole = 'user'; // Default role for new registrations
+        const userRole = 'user'; // Default role
 
-        // 3. Hash the password
         const hash = await bcrypt.hash(password, 10);
         
-        // 4. Insert into database
         const r = await runSql(
             'INSERT INTO users (name, email, password_hash, age, gender, role) VALUES (?, ?, ?, ?, ?, ?)', 
             [name, email, hash, validatedAge, validatedGender, userRole]
         );
 
-        // 5. Success
         res.json({ success: true, userId: r.insertId });
 
     } catch (e) {
-        // This handles DB errors (like NOT NULL violations, data type errors) and bcrypt errors
         console.error('Registration failed due to a server or DB issue:', e); 
-        
-        // Return a generic 500 error to the client
         res.status(500).json({ error: 'Server error: registration failed. Please try again later.' }); 
     }
 });
@@ -168,8 +123,8 @@ app.get('/api/schemes', async (req, res) => {
     let clauses = [];
     let params = [];
     if (q) { clauses.push("(scheme_name LIKE ? OR scholarship_name LIKE ?)"); params.push('%' + q + '%', '%' + q + '%'); }
-    if (academic_year) { clauses.push('academic_year = ?'); params.push(academic_year); }
-    if (type) { clauses.push('type = ?'); params.push(type); }
+    if (academic_year) { clauses.push('academic_year = ?'); params.push(academic_year.trim()); }
+    if (type) { clauses.push('type = ?'); params.push(type.trim()); }
     if (category) {
       const cats = category.split(',').map(s => s.trim());
       clauses.push('category IN (' + cats.map(() => '?').join(',') + ')');
@@ -177,7 +132,7 @@ app.get('/api/schemes', async (req, res) => {
     }
     if (international === '1') { clauses.push('is_international_eligible = 1'); }
     const where = clauses.length ? (' WHERE ' + clauses.join(' AND ')) : '';
-    const rows = await allSql('SELECT * FROM schemes' + where + ' ORDER BY application_deadline IS NULL, application_deadline');
+    const rows = await allSql('SELECT * FROM schemes' + where + ' ORDER BY application_deadline IS NULL, application_deadline',params);
     res.json({ schemes: rows });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error' }); }
 });
@@ -266,14 +221,28 @@ app.get('/api/admin/stats', async (req, res) => {
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error' }); }
 });
 
-// Exp 8 (View): Get pending applications from our View
+// Exp 8 (FIXED): Get pending applications with a direct JOIN
 app.get('/api/admin/pending-applications', async (req, res) => {
   try {
-    const rows = await allSql("SELECT * FROM v_admin_applications WHERE status='Pending'");
+    // Use a direct LEFT JOIN query instead of the broken view
+    const sql = `
+      SELECT 
+        a.id, 
+        a.application_date, 
+        a.status,
+        u.name as applicant_name,
+        u.email as applicant_email,
+        s.scheme_name
+      FROM applications a
+      LEFT JOIN users u ON a.user_id = u.id
+      LEFT JOIN schemes s ON a.scheme_id = s.id
+      WHERE a.status = 'Pending'
+      ORDER BY a.application_date ASC
+    `;
+    const rows = await allSql(sql);
     res.json({ applications: rows });
   } catch (e) { console.error(e); res.status(500).json({ error: 'Server error' }); }
 });
-
 // Exp 9 (Trigger): Approve/Reject an application
 app.post('/api/admin/application/:id/approve', async (req, res) => {
   try {
@@ -301,6 +270,18 @@ app.get(/^(?!\/api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// --- 8. START SERVER ---
-PORT = process.env.PORT || 5500;
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// --- 8. START SERVER (AFTER DB CHECK) ---
+// Test the connection pool and START the server
+pool.getConnection()
+    .then(conn => {
+        console.log('✅ Connected to MySQL database!');
+        conn.release();
+        
+        // --- START SERVER ---
+        // Only listen for connections AFTER the database is confirmed to be working
+        app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+    })
+    .catch(err => {
+        console.error('❌ FATAL ERROR: Could not connect to the database. Check your .env file and MySQL service:', err.message);
+        process.exit(1); 
+    });

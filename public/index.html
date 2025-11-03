@@ -516,7 +516,6 @@
   </nav>
 
   <div class="container">
-    <!-- HOME PAGE -->
     <div id="page-home" class="page active">
       <div class="hero">
         <h1 class="hero-title">Welcome to Scholarship Portal</h1>
@@ -546,7 +545,6 @@
       </div>
     </div>
 
-    <!-- LOGIN PAGE -->
     <div id="page-login" class="page">
       <div class="card" style="max-width: 500px; margin: 0 auto">
         <div class="card-header">
@@ -570,7 +568,6 @@
       </div>
     </div>
 
-    <!-- REGISTER PAGE -->
     <div id="page-register" class="page">
       <div class="card" style="max-width: 700px; margin: 0 auto">
         <div class="card-header">
@@ -622,7 +619,6 @@
       </div>
     </div>
 
-    <!-- BROWSE SCHEMES PAGE -->
     <div id="page-browse" class="page">
       <div class="card">
         <div class="card-header">
@@ -657,12 +653,10 @@
       <div id="schemesList"></div>
     </div>
 
-    <!-- SCHEME DETAILS PAGE -->
     <div id="page-scheme" class="page">
       <div class="card" id="schemeDetails"></div>
     </div>
 
-    <!-- APPLY PAGE -->
     <div id="page-apply" class="page">
       <div class="card">
         <div class="card-header">
@@ -698,7 +692,6 @@
         <form id="applyForm">
           <input type="hidden" name="scheme_id" id="applySchemeId">
           
-          <!-- Step 1 -->
           <div id="applyStep1" class="apply-step">
             <h3 style="margin-bottom:1rem">Personal & Contact Details</h3>
             <div class="form-row">
@@ -744,7 +737,6 @@
             <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next</button>
           </div>
 
-          <!-- Step 2 -->
           <div id="applyStep2" class="apply-step" style="display:none">
             <h3 style="margin-bottom:1rem">Family & Income Details</h3>
             <div class="form-row">
@@ -767,7 +759,6 @@
             </div>
           </div>
 
-          <!-- Step 3 -->
           <div id="applyStep3" class="apply-step" style="display:none">
             <h3 style="margin-bottom:1rem">Educational Qualifications</h3>
             <div class="form-row">
@@ -786,7 +777,6 @@
             </div>
           </div>
 
-          <!-- Step 4 -->
           <div id="applyStep4" class="apply-step" style="display:none">
             <h3 style="margin-bottom:1rem">Extracurricular Activities</h3>
             <div class="form-group">
@@ -799,7 +789,6 @@
             </div>
           </div>
 
-          <!-- Step 5 -->
           <div id="applyStep5" class="apply-step" style="display:none">
             <h3 style="margin-bottom:1rem">Document Upload</h3>
             <div class="form-group">
@@ -819,7 +808,6 @@
       </div>
     </div>
 
-    <!-- MY APPLICATIONS PAGE -->
     <div id="page-applications" class="page">
       <div class="card">
         <div class="card-header">
@@ -829,7 +817,6 @@
       </div>
     </div>
 
-    <!-- PROFILE PAGE -->
     <div id="page-profile" class="page">
       <div class="card">
         <div class="card-header">
@@ -839,7 +826,6 @@
       </div>
     </div>
 
-    <!-- ADMIN PAGE -->
     <div id="page-admin" class="page">
       <div class="card">
         <div class="card-header">
@@ -903,7 +889,7 @@
       const data = Object.fromEntries(formData);
       
       try {
-        const res = await fetch('http://localhost:5500/api/login', {
+        const res = await fetch('/api/login', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
@@ -911,7 +897,7 @@
         const result = await res.json();
         
         
-        if (res.ok) {          
+        if (res.ok) {         
           currentUser = result.user;
           updateNavigation();
           navigateTo('browse');
@@ -937,7 +923,7 @@
       }
 
       try {
-        const res = await fetch('http://localhost:5500/api/register', {
+        const res = await fetch('/api/register', {
         method: 'POST',
           headers: {'Content-Type': 'application/json'},
           body: JSON.stringify(data)
@@ -983,7 +969,7 @@
       if (international) params.set('international', '1');
 
       try {
-        const res = await fetch('http://localhost:5500/api/schemes?' + params.toString());
+        const res = await fetch('/api/schemes?' + params.toString());
         const result = await res.json();
 
         if (!result.schemes || result.schemes.length === 0) {
@@ -1026,7 +1012,7 @@
       navigateTo('scheme');
 
       try {
-        const res = await fetch('http://localhost:5500/api/schemes/' + id);
+        const res = await fetch('/api/schemes/' + id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1132,7 +1118,7 @@
       postData.append('data', JSON.stringify(data));
       
       try {
-        const res = await fetch('http://localhost:5500/api/apply', {
+        const res = await fetch('/api/apply', {
           method: 'POST',
           body: postData 
           // Do NOT set Content-Type, browser will set it to multipart/form-data
@@ -1162,7 +1148,7 @@
       listEl.innerHTML = '<div class="loading">Loading applications...</div>';
       
       try {
-        const res = await fetch('http://localhost:5500/api/my-applications/' + currentUser.id);
+        const res = await fetch('/api/my-applications/' + currentUser.id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1207,7 +1193,7 @@
     // View Application Details
     async function viewApplicationDetails(id) {
       try {
-        const res = await fetch('http://localhost:5500/api/application/' + id);
+        const res = await fetch('/api/application/' + id);
         const result = await res.json();
         if (!res.ok) throw new Error(result.error);
 
@@ -1274,7 +1260,7 @@
     async function loadAdminStats() {
       const statsEl = document.getElementById('adminStats');
       try {
-        const res = await fetch('http://localhost:5500/api/admin/stats');
+        const res = await fetch('/api/admin/stats');
         const stats = await res.json();
         statsEl.innerHTML = `
           <div class="stats-grid">
@@ -1300,7 +1286,7 @@
     async function loadAdminPending() {
       const pendingEl = document.getElementById('adminPending');
       try {
-        const res = await fetch('http://localhost:5500/api/admin/pending-applications');
+        const res = await fetch('/api/admin/pending-applications');
         const result = await res.json();
 
         if (!result.applications || result.applications.length === 0) {
@@ -1347,7 +1333,7 @@
     async function adminApprove(id) {
       if (!confirm('Are you sure you want to approve this application?')) return;
       try {
-        const res = await fetch('http://localhost:5500/api/admin/application/' + id + '/approve', { method: 'POST' });
+        const res = await fetch('/api/admin/application/' + id + '/approve', { method: 'POST' });
         if (!res.ok) throw new Error('Failed to approve');
         loadAdmin(); // Refresh data
       } catch (err) {
@@ -1359,7 +1345,7 @@
     async function adminReject(id) {
       if (!confirm('Are you sure you want to REJECT this application?')) return;
       try {
-        const res = await fetch('http://localhost:5500/api/admin/application/' + id + '/reject', { method: 'POST' });
+        const res = await fetch('/api/admin/application/' + id + '/reject', { method: 'POST' });
         if (!res.ok) throw new Error('Failed to reject');
         loadAdmin(); // Refresh data
       } catch (err) {
